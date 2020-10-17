@@ -1,9 +1,25 @@
 {% extends 'base.html' %}
 
 {% block content %}
-Welcome to Tweeter
 
-<div id="tweets">
+<div class="row text-center">
+    <div class="col">
+        <h1>Welcome to Tweeter</h1>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-4 mx-auto col-10">
+        <form class="form" method="POST" action="/create-tweet">
+            {% csrf_token %}
+            <input type="hidden" value="/" name="next" />
+            <textarea class="form-control" name="content" placeholder="Your tweet."></textarea>
+            <button type="submit" class="btn btn-primary">Tweet</button>
+        </form>
+    </div>
+</div>
+
+<div class="row" id="tweets">
     Loading...
 </div>
 
@@ -15,6 +31,23 @@ Welcome to Tweeter
     const url = "/tweets"
     const responseType = "json"
 
+    function handleDidLike(tweet_id, currentCount) {
+        console.log(tweet_id, currentCount)
+    }
+
+    function LikeBtn(tweet) {
+        return "<button class='btn btn-primary btn-sm' onclick=handleDidLike(" + 
+        tweet.id + "," + tweet.likes + ")>" + tweet.likes + " Likes</button>"
+    } 
+
+    function formatTweetElement(tweet) {
+        var formattedTweet = "<div class='col-12 col-md-10 mx-auto border rounded border-top border-bottom py-3 mb-4 tweet' id='tweet-" + tweet.id 
+        + "'><p>" + tweet.content + "</p><div class='btn-group'>"
+        + LikeBtn(tweet) 
+        + "</div></div>"
+        return formattedTweet
+    }
+
     xhr.responseType = responseType
     xhr.open(method, url)
     xhr.onload = function(){
@@ -23,8 +56,9 @@ Welcome to Tweeter
         // console.log(listedItems)
         var finalTweetStr = ""
         for(var i = 0; i < listedItems.length; i++){
-            var currentItem = "<div class='mb-4'><h1>" + listedItems[i].id + "</h1>" + "<p>" + listedItems[i].content + "</p></div>"
-            finalTweetStr += currentItem
+            tweetObj = listedItems[i];
+            var currentItem = formatTweetElement(tweetObj)
+            finalTweetStr +=  currentItem
         }
 
         tweetsElement.innerHTML = finalTweetStr
