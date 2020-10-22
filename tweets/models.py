@@ -1,10 +1,13 @@
 import random
+from django.conf import settings
 from django.db import models
 
-# Create your models here.
+User = settings.AUTH_USER_MODEL
 
 class Tweet(models.Model):
+    # Maps to SQL data
     # id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # each user can have many tweets, but each tweet belongs to a single user
     content = models.TextField(blank=True, null=True)
     image = models.FileField(upload_to='images/', blank=True, null=True)
 
