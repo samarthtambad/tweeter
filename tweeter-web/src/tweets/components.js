@@ -1,6 +1,46 @@
 import React, {useEffect, useState} from 'react'
 import {loadTweets} from '../lookup'
 
+export function TweetsComponent(props) {
+    const textAreaRef = React.createRef()
+    const handleSubmit = (event) => {
+        event.preventDefault()
+        console.log(event)
+        const newVal = textAreaRef.current.value
+        console.log(newVal)
+        textAreaRef.current.value = ''
+    }
+
+    return <div className={props.className}>
+        <div className='col-12 mb-3'>
+            <form onSubmit={handleSubmit}>
+            <textarea ref={textAreaRef} required={true} className='form-control' name='tweet'>
+
+            </textarea>
+            <button type='submit' className='btn btn-primary my-3'>Tweet</button>
+        </form>
+        </div>
+        <TweetsList />
+    </div>
+}
+
+export function TweetsList() {
+    const [tweets, setTweets] = useState([])
+
+    useEffect(() => {
+        // do my lookup
+        const myCallback = (response, status) => {
+        if(status === 200) {
+            setTweets(response)
+        }
+        }
+        loadTweets(myCallback)
+    }, [])
+    return tweets.map((item, index) => {
+        return <Tweet tweet={item} className="my-5 py-5 border bg-white text-dark" key={`${index}-{item.id}`}/>
+    })
+}
+
 export function ActionBtn(props) {
     const {tweet, action} = props
     const [likes, setLikes] = useState(tweet.likes ? tweet.likes : 0)
@@ -35,21 +75,4 @@ export function Tweet(props) {
         <ActionBtn tweet={tweet} action={{type: "retweet", display: "Retweet"}} />
         </div>
     </div>
-}
-  
-export function TweetsList() {
-    const [tweets, setTweets] = useState([])
-
-    useEffect(() => {
-        // do my lookup
-        const myCallback = (response, status) => {
-        if(status === 200) {
-            setTweets(response)
-        }
-        }
-        loadTweets(myCallback)
-    }, [])
-    return tweets.map((item, index) => {
-        return <Tweet tweet={item} className="my-5 py-5 border bg-white text-dark" key={`${index}-{item.id}`}/>
-    })
 }
